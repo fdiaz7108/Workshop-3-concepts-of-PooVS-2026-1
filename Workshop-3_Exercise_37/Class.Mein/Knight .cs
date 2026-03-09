@@ -1,85 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CosechandoACaballo
 {
 
-    public class ChessBoard
+    public class Knight
     {
 
-        private List<Knight> knights;
+        public Position Position { get; private set; }
 
 
-        public ChessBoard()
+        public Knight(Position position)
         {
-            knights = new List<Knight>();
+            Position = position;
         }
 
 
-        public void AddKnight(Knight knight)
+        public bool IsInConflictWith(Knight otherKnight)
         {
-            knights.Add(knight);
+
+            var (col1, row1) = this.Position.ToCoordinates();
+            var (col2, row2) = otherKnight.Position.ToCoordinates();
+
+
+            int colDiff = Math.Abs(col1 - col2);
+            int rowDiff = Math.Abs(row1 - row2);
+
+
+            return (colDiff == 2 && rowDiff == 1) || (colDiff == 1 && rowDiff == 2);
         }
 
 
-        public void AddKnightsFromInput(string input)
+
+        public List<Knight> FindConflicts(List<Knight> allKnights)
         {
-            if (string.IsNullOrEmpty(input))
-                return;
+            List<Knight> conflictingKnights = new List<Knight>();
 
-
-            string[] positions = input.Split(',');
-
-            foreach (string pos in positions)
-            {
-                try
-                {
-                    string cleanedPos = pos.Trim();
-                    if (!string.IsNullOrEmpty(cleanedPos))
-                    {
-                        Position position = Position.FromString(cleanedPos);
-                        Knight knight = new Knight(position);
-                        knights.Add(knight);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error al procesar la posición '{pos}': {ex.Message}");
-                }
-            }
-        }
-
-
-        public void AnalyzeConflicts()
-        {
-            foreach (var knight in knights)
+            foreach (var knight in allKnights)
             {
 
-                var conflictingKnights = knight.FindConflicts(knights);
-
-
-                Console.Write($"Analizando Caballo en {knight.Position} => ");
-
-                if (conflictingKnights.Any())
+                if (knight != this && this.IsInConflictWith(knight))
                 {
-
-                    var conflictPositions = conflictingKnights.Select(k => k.Position.ToString());
-                    Console.Write($"Conflicto con {string.Join(" ", conflictPositions)}");
+                    conflictingKnights.Add(knight);
                 }
-                else
-                {
-                    Console.Write("Ningún conflicto");
-                }
-
-                Console.WriteLine();
             }
+
+            return conflictingKnights;
         }
 
 
-        public List<Knight> GetKnights()
+        public override string ToString()
         {
-            return new List<Knight>(knights);
+            return Position.ToString();
         }
     }
 }
