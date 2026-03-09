@@ -1,6 +1,4 @@
-﻿using Main.Class;
-
-namespace LaVigaMasResistente
+﻿namespace LaVigaMasResistente
 {
     public class Beam
     {
